@@ -1,0 +1,13 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*.*.*"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci:
+    uses: Snip123/ai-test-platform-standards/.github/workflows/terraform.yml@main
+    secrets: inherit
