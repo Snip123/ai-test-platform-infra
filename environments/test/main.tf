@@ -77,13 +77,15 @@ module "gateway" {
   max_instance_count   = 5
   allow_public_ingress = true
 
+  # PORT is reserved in Cloud Run v2 — do not set it; the runtime injects it automatically.
   env_vars = {
-    PORT                = "8080"
     AUTH_DISABLED       = "false"
     UPSTREAM_ASSETS_URL = module.assets.url
     KEYCLOAK_URL        = module.keycloak.url
     OPENFGA_URL         = module.openfga.url
   }
+
+  depends_on = [google_project_iam_member.cloud_run_secrets]
 }
 
 # ── Assets service ────────────────────────────────────────────────────────────
@@ -100,8 +102,8 @@ module "assets" {
   max_instance_count   = 5
   allow_public_ingress = false
 
+  # PORT is reserved in Cloud Run v2 — do not set it; the runtime injects it automatically.
   env_vars = {
-    PORT              = "8080"
     NATS_URL          = module.nats.nats_url
     OTEL_SERVICE_NAME = "ai-test-assets-service"
   }
@@ -113,15 +115,18 @@ module "assets" {
       version     = "latest"
     }
   ]
+
+  depends_on = [google_project_iam_member.cloud_run_secrets]
 }
 
 # ── Keycloak ──────────────────────────────────────────────────────────────────
+# Image: docker.io required — Cloud Run v2 only accepts gcr.io, docker.pkg.dev, or docker.io.
 module "keycloak" {
   source                = "../../modules/cloud-run-service"
   project_id            = var.project_id
   region                = var.region
   service_name          = "${local.name_prefix}keycloak"
-  image                 = "quay.io/keycloak/keycloak:24.0"
+  image                 = "docker.io/keycloak/keycloak:24.0"
   environment           = local.env
   service_account_email = google_service_account.cloud_run.email
 
@@ -147,15 +152,18 @@ module "keycloak" {
       version     = "latest"
     }
   ]
+
+  depends_on = [google_project_iam_member.cloud_run_secrets]
 }
 
 # ── OpenFGA ───────────────────────────────────────────────────────────────────
+# Image: docker.io required — Cloud Run v2 only accepts gcr.io, docker.pkg.dev, or docker.io.
 module "openfga" {
   source                = "../../modules/cloud-run-service"
   project_id            = var.project_id
   region                = var.region
   service_name          = "${local.name_prefix}openfga"
-  image                 = "openfga/openfga:latest"
+  image                 = "docker.io/openfga/openfga:latest"
   environment           = local.env
   service_account_email = google_service_account.cloud_run.email
 
@@ -175,4 +183,6 @@ module "openfga" {
       version     = "latest"
     }
   ]
+
+  depends_on = [google_project_iam_member.cloud_run_secrets]
 }
