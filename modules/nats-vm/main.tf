@@ -69,8 +69,8 @@ resource "google_compute_instance" "nats" {
             mountPath = "/data"
           }]
           ports = [
-            { containerPort = 4222 } # client
-            { containerPort = 8222 } # monitoring
+            { containerPort = 4222 }, # client
+            { containerPort = 8222 }  # monitoring
           ]
         }]
         volumes = [{
