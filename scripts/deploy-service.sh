@@ -24,7 +24,7 @@ PREFIX="${ENVIRONMENT}-"
 [[ "$ENVIRONMENT" == "production" ]] && PREFIX=""
 
 CLOUD_RUN_SERVICE="${PREFIX}${SERVICE}"
-REGISTRY="${REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/fsi-platform"
+REGISTRY="${REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/cmms-platform"
 IMAGE="${REGISTRY}/${SERVICE}:${IMAGE_TAG}"
 
 echo ""

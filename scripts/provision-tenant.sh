@@ -25,7 +25,7 @@ fi
 
 INSTANCE_PREFIX="${ENVIRONMENT}-"
 [[ "$ENVIRONMENT" == "production" ]] && INSTANCE_PREFIX=""
-SQL_INSTANCE="${INSTANCE_PREFIX}fsi-postgres"
+SQL_INSTANCE="${INSTANCE_PREFIX}platform-postgres"
 
 echo ""
 echo "Provisioning Tenant: $TENANT_ID"
@@ -61,6 +61,6 @@ echo "Done! Tenant '$TENANT_ID' is provisioned in '$ENVIRONMENT'."
 echo ""
 echo "Next steps:"
 echo "  1. Create a Keycloak realm for this tenant via the Keycloak Admin API"
-echo "  2. Configure subdomain ${TENANT_ID}.fsi-platform.com in Cloud DNS"
+echo "  2. Configure subdomain ${TENANT_ID}.cmms-platform.example in Cloud DNS"
 echo "  3. Add tenant to Firebase Hosting rewrite rules"
 echo ""

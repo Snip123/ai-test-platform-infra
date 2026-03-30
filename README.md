@@ -1,6 +1,6 @@
 # ai-test-platform-infra
 
-Terraform infrastructure for the FSI EAM/CMMS platform.
+Terraform infrastructure for the EAM/CMMS platform.
 Three environments — all Cloud Run services **scale to zero** (ADR-0010).
 
 ## Environments
