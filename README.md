@@ -83,3 +83,13 @@ The `terraform.yml` reusable workflow in `ai-test-platform-standards` handles:
 - `v*.*.*` tag → `terraform apply` on `environments/production` (approval gate)
 
 See ADR-0013 for the full CI/CD strategy.
+
+## Docs
+
+### Platform (authoritative)
+- [Platform standards](https://github.com/Snip123/ai-test-platform-standards)
+- [ADR-0010 — Deployment infrastructure](https://github.com/Snip123/ai-test-platform-standards/blob/main/docs/adr/0010-deployment-infrastructure.md)
+- [ADR-0013 — CI/CD](https://github.com/Snip123/ai-test-platform-standards/blob/main/docs/adr/0013-ci-cd.md)
+- [ADR-0017 — Secret management](https://github.com/Snip123/ai-test-platform-standards/blob/main/docs/adr/0017-secret-management.md)
+- [ADR-0007 — PostgreSQL / per-tenant DB](https://github.com/Snip123/ai-test-platform-standards/blob/main/docs/adr/0007-postgresql-separate-db-per-tenant.md)
+- [ADR-0009 — NATS JetStream](https://github.com/Snip123/ai-test-platform-standards/blob/main/docs/adr/0009-event-streaming-nats-jetstream.md)
