@@ -3,7 +3,7 @@ terraform {
     # Bucket must be created once manually:
     #   gsutil mb -p $GCP_PROJECT_ID gs://$GCP_PROJECT_ID-terraform-state
     #   gsutil versioning set on gs://$GCP_PROJECT_ID-terraform-state
-    bucket = "REPLACE_WITH_GCP_PROJECT_ID-terraform-state"
+    bucket = "fsi-eam-platform-terraform-state"
     prefix = "environments/dev"
   }
 

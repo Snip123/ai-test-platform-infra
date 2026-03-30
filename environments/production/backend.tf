@@ -1,6 +1,6 @@
 terraform {
   backend "gcs" {
-    bucket = "REPLACE_WITH_GCP_PROJECT_ID-terraform-state"
+    bucket = "fsi-eam-platform-terraform-state"
     prefix = "environments/production"
   }
 
