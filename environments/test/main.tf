@@ -119,8 +119,8 @@ module "assets" {
   depends_on = [google_project_iam_member.cloud_run_secrets]
 }
 
-# ── Keycloak ──────────────────────────────────────────────────────────────────
-# Image: docker.io required — Cloud Run v2 only accepts gcr.io, docker.pkg.dev, or docker.io.
+# ── Keycloak ─────────────────────────────────────────────────────────────────
+# docker.io required — Cloud Run v2 only accepts gcr.io, docker.pkg.dev, or docker.io.
 module "keycloak" {
   source                = "../../modules/cloud-run-service"
   project_id            = var.project_id
@@ -156,8 +156,8 @@ module "keycloak" {
   depends_on = [google_project_iam_member.cloud_run_secrets]
 }
 
-# ── OpenFGA ───────────────────────────────────────────────────────────────────
-# Image: docker.io required — Cloud Run v2 only accepts gcr.io, docker.pkg.dev, or docker.io.
+# ── OpenFGA ──────────────────────────────────────────────────────────────────
+# docker.io required — Cloud Run v2 only accepts gcr.io, docker.pkg.dev, or docker.io.
 module "openfga" {
   source                = "../../modules/cloud-run-service"
   project_id            = var.project_id

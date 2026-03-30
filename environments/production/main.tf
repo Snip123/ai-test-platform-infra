@@ -132,12 +132,12 @@ module "assets" {
 }
 
 # ── Keycloak ──────────────────────────────────────────────────────────────────
+# docker.io required — Cloud Run v2 only accepts gcr.io, docker.pkg.dev, or docker.io.
 module "keycloak" {
   source                = "../../modules/cloud-run-service"
   project_id            = var.project_id
   region                = var.region
   service_name          = "keycloak"
-  # docker.io required — Cloud Run v2 only accepts gcr.io, docker.pkg.dev, or docker.io.
   image                 = "docker.io/keycloak/keycloak:24.0"
   environment           = local.env
   service_account_email = google_service_account.cloud_run.email
@@ -169,12 +169,12 @@ module "keycloak" {
 }
 
 # ── OpenFGA ───────────────────────────────────────────────────────────────────
+# docker.io required — Cloud Run v2 only accepts gcr.io, docker.pkg.dev, or docker.io.
 module "openfga" {
   source                = "../../modules/cloud-run-service"
   project_id            = var.project_id
   region                = var.region
   service_name          = "openfga"
-  # docker.io required — Cloud Run v2 only accepts gcr.io, docker.pkg.dev, or docker.io.
   image                 = "docker.io/openfga/openfga:latest"
   environment           = local.env
   service_account_email = google_service_account.cloud_run.email
