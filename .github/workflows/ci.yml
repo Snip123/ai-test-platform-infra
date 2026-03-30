@@ -10,4 +10,8 @@ on:
 jobs:
   ci:
     uses: Snip123/ai-test-platform-standards/.github/workflows/terraform.yml@main
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
     secrets: inherit
