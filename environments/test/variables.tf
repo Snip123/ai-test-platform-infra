@@ -26,3 +26,9 @@ variable "image_tag" {
   description = "Container image tag — CI/CD writes the SHA here on each deploy"
   default     = "latest"
 }
+
+variable "neon_api_key" {
+  type        = string
+  description = "Neon API key — obtain from https://console.neon.tech/app/settings/api-keys. Set as TF_VAR_neon_api_key or in terraform.tfvars (gitignored)."
+  sensitive   = true
+}

@@ -1,9 +1,14 @@
 # ── TEST ENVIRONMENT ──────────────────────────────────────────────────────────
 #
-# Staging / integration test environment.
-# Auto-deployed from main branch via GitHub Actions (ADR-0013).
-# All Cloud Run services scale to zero (min_instance_count = 0).
-# Cloud SQL uses db-f1-micro.
+# Staging / integration test environment. Auto-deployed from main (ADR-0013).
+#
+# Idle cost: $0/month
+#   - Cloud Run services: scale to zero (min_instance_count = 0)
+#   - PostgreSQL: Neon serverless — suspends after 5 min idle (ADR-0019)
+#   - NATS VM: GCP always-free e2-micro (1 free per project)
+#
+# Deploy:  terraform apply (handled by CI on main merge)
+# Destroy: terraform destroy
 # ─────────────────────────────────────────────────────────────────────────────
 
 locals {
@@ -12,7 +17,18 @@ locals {
   image_base  = "${var.region}-docker.pkg.dev/${var.project_id}/${var.artifact_registry_repo}"
 }
 
-# ── Service Accounts ──────────────────────────────────────────────────────────
+# ── Artifact Registry ─────────────────────────────────────────────────────────
+# Defined here (test is the first environment to run in CI).
+# Shared across test and production — images are tagged per environment.
+resource "google_artifact_registry_repository" "fsi_platform" {
+  project       = var.project_id
+  location      = var.region
+  repository_id = var.artifact_registry_repo
+  format        = "DOCKER"
+  description   = "FSI EAM/CMMS platform container images"
+}
+
+# ── Service Account ───────────────────────────────────────────────────────────
 resource "google_service_account" "cloud_run" {
   project      = var.project_id
   account_id   = "${local.name_prefix}cloud-run"
@@ -25,27 +41,19 @@ resource "google_project_iam_member" "cloud_run_secrets" {
   member  = "serviceAccount:${google_service_account.cloud_run.email}"
 }
 
-resource "google_project_iam_member" "cloud_run_sql" {
-  project = var.project_id
-  role    = "roles/cloudsql.client"
-  member  = "serviceAccount:${google_service_account.cloud_run.email}"
-}
-
-# ── Cloud SQL ─────────────────────────────────────────────────────────────────
-module "cloud_sql" {
-  source        = "../../modules/cloud-sql"
-  project_id    = var.project_id
-  region        = var.region
-  environment   = local.env
-  instance_name = "${local.name_prefix}fsi-postgres"
-  tier          = "db-f1-micro"
-
-  databases           = ["keycloak", "openfga", "tenant_test"]
-  backup_enabled      = false
-  deletion_protection = false
+# ── Neon serverless Postgres (ADR-0019) ───────────────────────────────────────
+# Replaces Cloud SQL for non-production. Scales to zero — $0 idle cost.
+module "neon" {
+  source       = "../../modules/neon-environment"
+  environment  = local.env
+  neon_api_key = var.neon_api_key
+  project_id   = var.project_id
+  databases    = ["keycloak", "openfga", "tenant_test"]
 }
 
 # ── NATS JetStream VM ─────────────────────────────────────────────────────────
+# GCP always-free e2-micro (1 per project) — $0/month.
+# Shared by dev (local) and test (cloud). Production gets its own VM.
 module "nats" {
   source       = "../../modules/nats-vm"
   project_id   = var.project_id
@@ -101,7 +109,7 @@ module "assets" {
   secret_env_vars = [
     {
       env_var     = "DATABASE_URL"
-      secret_name = "${local.env}-cloud-sql-fsi-password"
+      secret_name = module.neon.db_secret_ids["tenant_test"]
       version     = "latest"
     }
   ]
@@ -135,7 +143,7 @@ module "keycloak" {
     },
     {
       env_var     = "KC_DB_URL"
-      secret_name = "${local.env}-keycloak-db-url"
+      secret_name = module.neon.db_secret_ids["keycloak"]
       version     = "latest"
     }
   ]
@@ -163,7 +171,7 @@ module "openfga" {
   secret_env_vars = [
     {
       env_var     = "OPENFGA_DATASTORE_URI"
-      secret_name = "${local.env}-openfga-db-url"
+      secret_name = module.neon.db_secret_ids["openfga"]
       version     = "latest"
     }
   ]

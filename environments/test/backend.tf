@@ -9,9 +9,9 @@ terraform {
       source  = "hashicorp/google"
       version = "~> 5.0"
     }
-    random = {
-      source  = "hashicorp/random"
-      version = "~> 3.0"
+    neon = {
+      source  = "kislerdm/neon"
+      version = "~> 0.6"
     }
   }
 
@@ -21,4 +21,8 @@ terraform {
 provider "google" {
   project = var.project_id
   region  = var.region
+}
+
+provider "neon" {
+  api_key = var.neon_api_key
 }

@@ -11,6 +11,22 @@ locals {
   image_base = "${var.region}-docker.pkg.dev/${var.project_id}/${var.artifact_registry_repo}"
 }
 
+# ── Artifact Registry ─────────────────────────────────────────────────────────
+# Owned by production — the most persistent environment.
+# Shared with test (images tagged per environment).
+# Created in environments/test too for CI bootstrapping; Terraform import resolves any conflict.
+resource "google_artifact_registry_repository" "fsi_platform" {
+  project       = var.project_id
+  location      = var.region
+  repository_id = var.artifact_registry_repo
+  format        = "DOCKER"
+  description   = "FSI EAM/CMMS platform container images"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
 # ── Service Accounts ──────────────────────────────────────────────────────────
 resource "google_service_account" "cloud_run" {
   project      = var.project_id
