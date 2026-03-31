@@ -13,19 +13,13 @@ terraform {
 
 # Neon serverless Postgres — scales compute to zero after 5 min idle (ADR-0019).
 # Free tier: 1 project, 0.5 GB storage, auto-suspend. No idle cost.
+# Free plan auto-suspends after 5 min idle by default — no configuration needed.
+# Paid plans can set suspend_timeout_seconds and autoscaling_limit_* here.
 resource "neon_project" "this" {
   name       = "fsi-platform-${var.environment}"
   org_id     = var.neon_org_id
   region_id  = "aws-us-east-1"
   pg_version = 16
-
-  default_endpoint_settings {
-    # Scale to zero after 5 minutes idle (300s).
-    # First request after idle incurs ~500ms cold start — acceptable for non-production.
-    suspend_timeout_seconds  = 300
-    autoscaling_limit_min_cu = 0.25
-    autoscaling_limit_max_cu = 0.25
-  }
 }
 
 # Application role — matches the 'fsi' user used in local docker-compose (ADR-0007).
