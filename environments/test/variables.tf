@@ -32,3 +32,8 @@ variable "neon_api_key" {
   description = "Neon API key — obtain from https://console.neon.tech/app/settings/api-keys. Set as TF_VAR_neon_api_key or in terraform.tfvars (gitignored)."
   sensitive   = true
 }
+
+variable "neon_org_id" {
+  type        = string
+  description = "Neon organization ID — find at https://console.neon.tech/app/settings. Set as NEON_ORG_ID repo variable in GitHub Actions."
+}

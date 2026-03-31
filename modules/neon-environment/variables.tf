@@ -13,6 +13,11 @@ variable "neon_api_key" {
   sensitive   = true
 }
 
+variable "neon_org_id" {
+  type        = string
+  description = "Neon organization ID — find at https://console.neon.tech/app/settings (Organization ID field)"
+}
+
 variable "project_id" {
   type        = string
   description = "GCP project ID — used to store connection strings in Secret Manager"

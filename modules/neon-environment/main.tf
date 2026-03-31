@@ -15,6 +15,7 @@ terraform {
 # Free tier: 1 project, 0.5 GB storage, auto-suspend. No idle cost.
 resource "neon_project" "this" {
   name       = "fsi-platform-${var.environment}"
+  org_id     = var.neon_org_id
   region_id  = "aws-us-east-1"
   pg_version = 16
 

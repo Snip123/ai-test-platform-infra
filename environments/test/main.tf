@@ -47,8 +47,30 @@ module "neon" {
   source       = "../../modules/neon-environment"
   environment  = local.env
   neon_api_key = var.neon_api_key
+  neon_org_id  = var.neon_org_id
   project_id   = var.project_id
   databases    = ["keycloak", "openfga", "tenant_test"]
+}
+
+# ── Keycloak admin password ───────────────────────────────────────────────────
+# Generated once; stored in Secret Manager; not rotated by Terraform.
+resource "random_password" "keycloak_admin" {
+  length  = 32
+  special = false
+}
+
+resource "google_secret_manager_secret" "keycloak_admin_password" {
+  project   = var.project_id
+  secret_id = "${local.env}-keycloak-admin-password"
+
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret_version" "keycloak_admin_password" {
+  secret      = google_secret_manager_secret.keycloak_admin_password.id
+  secret_data = random_password.keycloak_admin.result
 }
 
 # ── NATS JetStream VM ─────────────────────────────────────────────────────────
@@ -68,8 +90,10 @@ module "gateway" {
   source                = "../../modules/cloud-run-service"
   project_id            = var.project_id
   region                = var.region
-  service_name          = "${local.name_prefix}ai-test-gateway-service"
-  image                 = "${local.image_base}/ai-test-gateway-service:${var.image_tag}"
+  service_name = "${local.name_prefix}ai-test-gateway-service"
+  # Placeholder image for initial Terraform bootstrap.
+  # CI/CD replaces the running image via gcloud run deploy; lifecycle.ignore_changes prevents rollback.
+  image = "us-docker.pkg.dev/cloudrun/container/hello:latest"
   environment           = local.env
   service_account_email = google_service_account.cloud_run.email
 
@@ -93,8 +117,10 @@ module "assets" {
   source                = "../../modules/cloud-run-service"
   project_id            = var.project_id
   region                = var.region
-  service_name          = "${local.name_prefix}ai-test-assets-service"
-  image                 = "${local.image_base}/ai-test-assets-service:${var.image_tag}"
+  service_name = "${local.name_prefix}ai-test-assets-service"
+  # Placeholder image for initial Terraform bootstrap.
+  # CI/CD replaces the running image via gcloud run deploy; lifecycle.ignore_changes prevents rollback.
+  image = "us-docker.pkg.dev/cloudrun/container/hello:latest"
   environment           = local.env
   service_account_email = google_service_account.cloud_run.email
 
@@ -153,7 +179,10 @@ module "keycloak" {
     }
   ]
 
-  depends_on = [google_project_iam_member.cloud_run_secrets]
+  depends_on = [
+    google_project_iam_member.cloud_run_secrets,
+    google_secret_manager_secret_version.keycloak_admin_password,
+  ]
 }
 
 # ── OpenFGA ──────────────────────────────────────────────────────────────────
