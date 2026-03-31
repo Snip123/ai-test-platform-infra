@@ -89,7 +89,6 @@ module "gateway" {
   max_instance_count   = 10
   allow_public_ingress = true
 
-  # PORT is reserved in Cloud Run v2 — do not set it; the runtime injects it automatically.
   env_vars = {
     AUTH_DISABLED       = "false"
     UPSTREAM_ASSETS_URL = module.assets.url
@@ -114,7 +113,6 @@ module "assets" {
   max_instance_count   = 10
   allow_public_ingress = false
 
-  # PORT is reserved in Cloud Run v2 — do not set it; the runtime injects it automatically.
   env_vars = {
     NATS_URL          = module.nats.nats_url
     OTEL_SERVICE_NAME = "ai-test-assets-service"

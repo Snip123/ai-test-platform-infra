@@ -86,14 +86,13 @@ module "nats" {
 }
 
 # ── Gateway service ───────────────────────────────────────────────────────────
+# Placeholder image — CI/CD replaces via gcloud run deploy; lifecycle.ignore_changes prevents rollback.
 module "gateway" {
   source                = "../../modules/cloud-run-service"
   project_id            = var.project_id
   region                = var.region
-  service_name = "${local.name_prefix}ai-test-gateway-service"
-  # Placeholder image for initial Terraform bootstrap.
-  # CI/CD replaces the running image via gcloud run deploy; lifecycle.ignore_changes prevents rollback.
-  image = "us-docker.pkg.dev/cloudrun/container/hello:latest"
+  service_name          = "${local.name_prefix}ai-test-gateway-service"
+  image                 = "us-docker.pkg.dev/cloudrun/container/hello:latest"
   environment           = local.env
   service_account_email = google_service_account.cloud_run.email
 
@@ -101,7 +100,6 @@ module "gateway" {
   max_instance_count   = 5
   allow_public_ingress = true
 
-  # PORT is reserved in Cloud Run v2 — do not set it; the runtime injects it automatically.
   env_vars = {
     AUTH_DISABLED       = "false"
     UPSTREAM_ASSETS_URL = module.assets.url
@@ -113,14 +111,13 @@ module "gateway" {
 }
 
 # ── Assets service ────────────────────────────────────────────────────────────
+# Placeholder image — CI/CD replaces via gcloud run deploy; lifecycle.ignore_changes prevents rollback.
 module "assets" {
   source                = "../../modules/cloud-run-service"
   project_id            = var.project_id
   region                = var.region
-  service_name = "${local.name_prefix}ai-test-assets-service"
-  # Placeholder image for initial Terraform bootstrap.
-  # CI/CD replaces the running image via gcloud run deploy; lifecycle.ignore_changes prevents rollback.
-  image = "us-docker.pkg.dev/cloudrun/container/hello:latest"
+  service_name          = "${local.name_prefix}ai-test-assets-service"
+  image                 = "us-docker.pkg.dev/cloudrun/container/hello:latest"
   environment           = local.env
   service_account_email = google_service_account.cloud_run.email
 
@@ -128,7 +125,6 @@ module "assets" {
   max_instance_count   = 5
   allow_public_ingress = false
 
-  # PORT is reserved in Cloud Run v2 — do not set it; the runtime injects it automatically.
   env_vars = {
     NATS_URL          = module.nats.nats_url
     OTEL_SERVICE_NAME = "ai-test-assets-service"
